@@ -1,92 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Interactive modeling, simulation and control of mechanical, electrical, pneumatic, hydraulic and multi-domain dynamic systems." />
-  <title>Multi-Domain Dynamic Systems | Richard Okello</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Multi-Domain Dynamic Systems | Richard Okello</title>
+<meta name="description" content="Interactive modeling, simulation and control of mechanical, electrical, pneumatic and hydraulic systems.">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="nav-wrap">
-    <nav class="nav container">
-      <a class="brand" href="#top"><span class="brand-mark">Σ</span><span>MultiDomain Control</span></a>
-      <div class="nav-links">
-        <a href="#systems">Systems</a><a href="#demo">Interactive Demo</a><a href="#workflow">Workflow</a><a href="#matlab">MATLAB vs Python</a>
-      </div>
-      <a class="btn btn-small" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control" target="_blank" rel="noreferrer">GitHub ↗</a>
-    </nav>
-  </header>
+<header class="topbar"><nav class="container nav"><a class="brand" href="#top">Σ MultiDomain Control</a><div class="links"><a href="#overview">Overview</a><a href="#simulator">Simulator</a><a href="#notebooks">Notebooks</a><a href="#methods">Methods</a><a href="#matlab">MATLAB</a></div><a class="btn small" target="_blank" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control">GitHub ↗</a></nav></header>
+<main id="top">
+<section class="hero container"><div><p class="kicker">DYNAMIC SYSTEMS • CONTROL • SIMULATION</p><h1>Model the physics.<br><span>Control the response.</span></h1><p class="lead">A multi-domain engineering project for mechanical, electrical, pneumatic and hydraulic systems — from governing equations to closed-loop control.</p><div class="actions"><a class="btn" href="#simulator">Open interactive simulator</a><a class="btn ghost" href="#notebooks">Explore notebooks</a></div><div class="stats"><div><strong>5</strong><span>engineering notebooks</span></div><div><strong>4+</strong><span>physical domains</span></div><div><strong>30+</strong><span>control & analysis topics</span></div></div></div><div class="scope"><div class="scopehead"><span>closed_loop_response</span><b>STABLE</b></div><canvas id="heroCanvas" width="760" height="430"></canvas><div class="scopefoot"><span>response</span><span>reference</span><span>ζ = 0.42</span></div></div></section>
+<section class="strip"><div class="container">DIFFERENTIAL EQUATIONS • TRANSFER FUNCTIONS • STATE SPACE • POLE–ZERO • ROOT LOCUS • BODE • NYQUIST • PID • LQR • DIGITAL CONTROL</div></section>
 
-  <main id="top">
-    <section class="hero container">
-      <div class="hero-copy">
-        <div class="eyebrow">CONTROL • MODELING • SIMULATION</div>
-        <h1>Multi-Domain Dynamic Systems</h1>
-        <p class="hero-lead">An interactive engineering project for modeling, simulation, stability analysis and control of <strong>mechanical, electrical, pneumatic and hydraulic systems</strong> using Python and Jupyter.</p>
-        <div class="hero-actions">
-          <a class="btn" href="#demo">Try the simulation</a>
-          <a class="btn btn-ghost" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control" target="_blank" rel="noreferrer">View repository</a>
-        </div>
-        <div class="hero-stats">
-          <div><span class="stat-value">5</span><span class="stat-label">Jupyter notebooks</span></div>
-          <div><span class="stat-value">4+</span><span class="stat-label">physical domains</span></div>
-          <div><span class="stat-value">PID</span><span class="stat-label">to LQR & observers</span></div>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="scope-card">
-          <div class="scope-topbar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="scope-title">closed_loop_response.py</span></div>
-          <canvas id="heroScope" width="740" height="430"></canvas>
-          <div class="scope-readout"><span><i class="legend-line response"></i> response</span><span><i class="legend-line reference"></i> reference</span><span class="mono">ζ = 0.42</span></div>
-        </div>
-      </div>
-    </section>
+<section id="overview" class="section container"><div class="heading"><div><p class="kicker">PROJECT OVERVIEW</p><h2>One framework across physical domains.</h2></div><p>Derive, model, simulate, analyze, control and compare.</p></div><div class="grid">
+<article class="card"><span class="badge">M</span><h3>Mechanical Systems</h3><p>Mass–spring–damper, rotational dynamics, gears, multi-DOF models, friction, backlash and saturation.</p><code>mẍ + bẋ + kx = F(t)</code></article>
+<article class="card"><span class="badge blue">E</span><h3>Electrical Systems</h3><p>RC/RL/RLC circuits, DC motors, converters, transformers, generators and electromechanical coupling.</p><code>Lq̈ + Rq̇ + q/C = V(t)</code></article>
+<article class="card"><span class="badge gold">P</span><h3>Pneumatic Systems</h3><p>Compressible-air cylinders, chamber pressure, valve flow, leakage and spool dynamics.</p><code>mẍ + bẋ + kx = AΔP − Fₗ</code></article>
+<article class="card"><span class="badge cyan">H</span><h3>Hydraulic Systems</h3><p>Compressibility, nonlinear orifice flow, cylinders, leakage, accumulators and cavitation checks.</p><code>ΔṖ = β/Vₜ(Q − 2Aẋ − CₗΔP)</code></article>
+</div></section>
 
-    <section class="strip"><div class="container strip-inner"><span>DIFFERENTIAL EQUATIONS</span><span>TRANSFER FUNCTIONS</span><span>STATE SPACE</span><span>STABILITY</span><span>FREQUENCY RESPONSE</span><span>DIGITAL CONTROL</span></div></section>
+<section id="simulator" class="section dark"><div class="container"><div class="heading"><div><p class="kicker">INTERACTIVE MULTI-DOMAIN SIMULATOR</p><h2>Change parameters. Watch the dynamics change.</h2></div><p>A lightweight browser companion to the Jupyter notebooks.</p></div>
+<div class="sim"><div class="tabs"><button class="tab active" data-mode="mechanical">Mechanical</button><button class="tab" data-mode="electrical">Electrical RLC</button><button class="tab" data-mode="pneumatic">Pneumatic</button><button class="tab" data-mode="hydraulic">Hydraulic</button></div><div class="simbody"><aside><div id="controls"></div><div class="metrics"><div><span>Primary</span><strong id="m1">—</strong></div><div><span>Secondary</span><strong id="m2">—</strong></div><div><span>Classification</span><strong id="m3">—</strong></div><div><span>Stability</span><strong id="m4">—</strong></div></div></aside><div class="plot"><div class="plothead"><div><strong id="plotTitle">Mechanical step response</strong><span id="plotSub">normalized displacement</span></div><b id="status">Stable</b></div><canvas id="simCanvas" width="1100" height="560"></canvas></div></div></div></div></section>
 
-    <section id="systems" class="section container">
-      <div class="section-heading"><div><div class="eyebrow">PHYSICAL DOMAINS</div><h2>One control framework, multiple systems.</h2></div><p>Each notebook starts from physical laws, builds a mathematical model, simulates the dynamics and applies control-system analysis.</p></div>
-      <div class="domain-grid">
-        <article class="domain-card"><div class="domain-icon">M</div><h3>Mechanical</h3><p>Mass–spring–damper, rotational systems, gears, multi-DOF models, friction, backlash and saturation.</p><code>mẍ + bẋ + kx = F(t)</code><a href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/01_Mechanical_Systems_Modeling_Simulation_and_Control.ipynb" target="_blank">Open notebook ↗</a></article>
-        <article class="domain-card"><div class="domain-icon">E</div><h3>Electrical</h3><p>RC/RL/RLC circuits, DC motors, power converters, transformers, generators and coupled electromechanics.</p><code>Lq̈ + Rq̇ + q/C = V(t)</code><a href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/02_Electrical_Systems_Modeling_Simulation_and_Control.ipynb" target="_blank">Open notebook ↗</a></article>
-        <article class="domain-card"><div class="domain-icon">P</div><h3>Pneumatic</h3><p>Compressible-air cylinder dynamics, valve flow, chamber pressure, leakage, spool dynamics and load motion.</p><code>mẍ + bẋ + kx = AΔP − Fₗ</code><a href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/03_Pneumatic_Systems_Modeling_Simulation_and_Control.ipynb" target="_blank">Open notebook ↗</a></article>
-        <article class="domain-card"><div class="domain-icon">H</div><h3>Hydraulic</h3><p>Fluid compressibility, orifice flow, asymmetric cylinders, relief behavior, accumulators and cavitation logic.</p><code>ΔṖ = β/Vₜ (Q − 2Aẋ − CₗΔP)</code><a href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/04_Hydraulic_Systems_Modeling_Simulation_and_Control.ipynb" target="_blank">Open notebook ↗</a></article>
-      </div>
-    </section>
+<section id="notebooks" class="section container"><div class="heading"><div><p class="kicker">PROJECT NOTEBOOKS</p><h2>The website is the front door. The notebooks are the engineering core.</h2></div></div><div class="notebooks">
+<a target="_blank" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/01_Mechanical_Systems_Modeling_Simulation_and_Control.ipynb"><span>01</span><div><b>Mechanical Systems Modeling, Simulation and Control</b><small>Classical control • state space • nonlinearities</small></div><em>↗</em></a>
+<a target="_blank" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/02_Electrical_Systems_Modeling_Simulation_and_Control.ipynb"><span>02</span><div><b>Electrical Systems Modeling, Simulation and Control</b><small>RLC • DC motor • converters • generators</small></div><em>↗</em></a>
+<a target="_blank" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/03_Pneumatic_Systems_Modeling_Simulation_and_Control.ipynb"><span>03</span><div><b>Pneumatic Systems Modeling, Simulation and Control</b><small>Pressure dynamics • valves • nonlinear actuator</small></div><em>↗</em></a>
+<a target="_blank" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/04_Hydraulic_Systems_Modeling_Simulation_and_Control.ipynb"><span>04</span><div><b>Hydraulic Systems Modeling, Simulation and Control</b><small>Orifice flow • compressibility • cylinders</small></div><em>↗</em></a>
+<a class="featured" target="_blank" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control/blob/master/05_MultiDomain_Dynamic_Systems_Modeling_Simulation_and_Control.ipynb"><span>05</span><div><b>Multi-Domain Dynamic Systems Modeling, Simulation and Control</b><small>Electromechanical • electro-pneumatic • electro-hydraulic</small></div><em>↗</em></a>
+</div></section>
 
-    <section id="demo" class="section demo-section"><div class="container">
-      <div class="section-heading"><div><div class="eyebrow">LIVE BROWSER SIMULATION</div><h2>Tune a mass–spring–damper system.</h2></div><p>Change the parameters and watch the response, damping classification and pole locations update immediately.</p></div>
-      <div class="demo-layout">
-        <div class="controls-panel">
-          <div class="control-row"><div class="label-line"><label for="mass">Mass, m</label><output id="massValue">10.0 kg</output></div><input id="mass" type="range" min="1" max="30" step="0.5" value="10"></div>
-          <div class="control-row"><div class="label-line"><label for="damping">Damping, b</label><output id="dampingValue">8.0 N·s/m</output></div><input id="damping" type="range" min="0" max="50" step="0.5" value="8"></div>
-          <div class="control-row"><div class="label-line"><label for="stiffness">Stiffness, k</label><output id="stiffnessValue">100 N/m</output></div><input id="stiffness" type="range" min="10" max="300" step="5" value="100"></div>
-          <div class="control-row"><div class="label-line"><label for="force">Step force, F</label><output id="forceValue">10 N</output></div><input id="force" type="range" min="1" max="50" step="1" value="10"></div>
-          <div class="metrics"><div class="metric"><span>Natural frequency</span><strong id="wnMetric">—</strong></div><div class="metric"><span>Damping ratio</span><strong id="zetaMetric">—</strong></div><div class="metric"><span>Classification</span><strong id="classMetric">—</strong></div><div class="metric"><span>Poles</span><strong id="polesMetric" class="mono">—</strong></div></div>
-        </div>
-        <div class="plot-panel"><div class="plot-head"><div><strong>Step response</strong><span>x(t) / x∞</span></div><span class="status-pill" id="stabilityPill">Stable</span></div><canvas id="responseCanvas" width="1000" height="520"></canvas></div>
-      </div>
-    </div></section>
+<section id="methods" class="section dark"><div class="container methods"><div><p class="kicker">ANALYSIS & CONTROL METHODS</p><h2>Beyond simple time-response plots.</h2><p class="muted">Classical and modern control methods, robustness, digital control and nonlinear simulation.</p><div class="chips"><span>Step / Impulse / Ramp</span><span>Pole–Zero</span><span>Routh–Hurwitz</span><span>Root Locus</span><span>Bode</span><span>Nyquist</span><span>Nichols</span><span>PID</span><span>Lead / Lag</span><span>Feedforward</span><span>Cascade</span><span>State Feedback</span><span>Observers</span><span>LQR</span><span>Kalman / LQG</span><span>Jury Stability</span></div></div><div class="plots"><div class="miniplot"><div>Pole–Zero Map</div><canvas id="poleCanvas" width="620" height="310"></canvas></div><div class="miniplot"><div>Bode Magnitude</div><canvas id="bodeCanvas" width="620" height="310"></canvas></div></div></div></section>
 
-    <section id="workflow" class="section container">
-      <div class="section-heading"><div><div class="eyebrow">ENGINEERING WORKFLOW</div><h2>From physics to closed-loop control.</h2></div><p>The project makes every step visible instead of hiding the mathematics behind a graphical model.</p></div>
-      <div class="workflow"><div class="workflow-step"><span>01</span><strong>Physical system</strong><small>Define geometry, loads and parameters.</small></div><div class="workflow-arrow">→</div><div class="workflow-step"><span>02</span><strong>Governing laws</strong><small>Newton, Kirchhoff, continuity and energy.</small></div><div class="workflow-arrow">→</div><div class="workflow-step"><span>03</span><strong>Mathematical model</strong><small>Differential equations, TF and state space.</small></div><div class="workflow-arrow">→</div><div class="workflow-step"><span>04</span><strong>Simulation</strong><small>Transient and nonlinear behavior.</small></div><div class="workflow-arrow">→</div><div class="workflow-step"><span>05</span><strong>Control</strong><small>PID, compensation, state feedback and LQR.</small></div></div>
-    </section>
+<section id="matlab" class="section container"><div class="heading"><div><p class="kicker">MATLAB / SIMULINK COMPARISON</p><h2>Comparable concepts, a more transparent workflow.</h2></div><p>MATLAB/Simulink remains stronger for graphical block diagrams and Simscape physical libraries.</p></div><div class="compare"><div class="row head"><div>Capability</div><div>Python / Jupyter</div><div>MATLAB / Simulink</div></div><div class="row"><div>Transfer functions & state space</div><div>✓</div><div>✓</div></div><div class="row"><div>Bode, Nyquist, Nichols & root locus</div><div>✓</div><div>✓</div></div><div class="row"><div>PID, observers, state feedback & LQR</div><div>✓</div><div>✓</div></div><div class="row"><div>Interactive tuning</div><div>ipywidgets / browser controls</div><div>Apps / Simulink</div></div><div class="row"><div>Graphical physical libraries</div><div>Limited</div><div>Excellent</div></div><div class="row"><div>Equation / source visibility</div><div>Fully open</div><div>Toolbox workflow</div></div></div></section>
 
-    <section class="section analysis-section"><div class="container analysis-grid"><div class="analysis-copy"><div class="eyebrow">CONTROL ANALYSIS</div><h2>Plots that explain what the system is doing.</h2><p>The notebooks generate time-domain and frequency-domain visualizations for understanding response speed, damping, stability, resonance and controller performance.</p><div class="chips"><span>Step</span><span>Impulse</span><span>Ramp</span><span>Pole–Zero</span><span>Root Locus</span><span>Bode</span><span>Nyquist</span><span>Nichols</span><span>Sensitivity</span></div></div><div class="mini-plots"><div class="mini-card"><div class="mini-title">Pole–Zero Map</div><canvas id="poleCanvas" width="520" height="280"></canvas></div><div class="mini-card"><div class="mini-title">Frequency Response</div><canvas id="bodeCanvas" width="520" height="280"></canvas></div></div></div></section>
-
-    <section id="matlab" class="section container">
-      <div class="section-heading"><div><div class="eyebrow">MATLAB / SIMULINK COMPARISON</div><h2>Similar control concepts, different workflow.</h2></div><p>The project recreates many Control System Toolbox-style analyses in Python while keeping the model and calculations fully transparent.</p></div>
-      <div class="compare-table"><div class="compare-head"><div>Capability</div><div>Python / Jupyter project</div><div>MATLAB / Simulink</div></div><div class="compare-row"><div>Transfer functions & state space</div><div>✓</div><div>✓</div></div><div class="compare-row"><div>Bode, Nyquist, Nichols, root locus</div><div>✓</div><div>✓</div></div><div class="compare-row"><div>PID, state feedback, observers, LQR</div><div>✓</div><div>✓</div></div><div class="compare-row"><div>Interactive parameter tuning</div><div>Jupyter widgets</div><div>Apps / Simulink blocks</div></div><div class="compare-row"><div>Graphical block-diagram modeling</div><div>Limited</div><div>Excellent</div></div><div class="compare-row"><div>Equations & source code visibility</div><div>Fully open</div><div>Toolbox workflow</div></div></div>
-    </section>
-
-    <section class="section final-cta"><div class="container final-card"><div><div class="eyebrow">EXPLORE THE FULL PROJECT</div><h2>Five notebooks. One multi-domain control framework.</h2><p>Explore the models, controllers, nonlinear simulations and interactive plots in the full repository.</p></div><a class="btn" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control" target="_blank" rel="noreferrer">Open on GitHub ↗</a></div></section>
-  </main>
-  <footer><div class="container footer-inner"><div><strong>Richard Okello</strong><span>Control & Instrumentation • Data Science</span></div><div class="mono">Multi-Domain Dynamic Systems Modeling, Simulation and Control</div></div></footer>
-  <script src="app.js"></script>
-</body>
-</html>
+<section class="section container"><div class="cta"><div><p class="kicker">FULL REPOSITORY</p><h2>Explore the complete engineering project.</h2><p class="muted">Five notebooks, interactive models, controller design, frequency analysis, nonlinear dynamics and multi-domain integration.</p></div><a class="btn" target="_blank" href="https://github.com/RichWOkello/MultiDomain-Dynamic-Systems-Modeling-Simulation-and-Control">Open GitHub Repository ↗</a></div></section>
+</main>
+<footer><div class="container footer"><div><b>Richard Okello</b><span>Control & Instrumentation • Data Science</span></div><div>Multi-Domain Dynamic Systems Modeling, Simulation and Control</div></div></footer>
+<script src="app.js"></script>
+</body></html>
