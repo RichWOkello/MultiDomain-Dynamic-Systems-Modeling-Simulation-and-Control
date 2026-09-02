@@ -1,0 +1,8 @@
+numpy
+scipy
+matplotlib
+ipywidgets
+control
+jupyter
+jupyterlab
+notebook
