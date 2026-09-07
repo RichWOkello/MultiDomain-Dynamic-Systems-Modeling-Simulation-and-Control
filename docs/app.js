@@ -10,7 +10,7 @@ function secondOrderPoles(m,b,k){let D=b*b-4*m*k;if(D>=0){let r=Math.sqrt(D);ret
 function poleText(ps){let p=ps[0];if(typeof p==='number')return`${ps[0].toFixed(2)}, ${ps[1].toFixed(2)}`;return`${p.re.toFixed(2)} ± j${Math.abs(p.im).toFixed(2)}`}
 function statusFromRealParts(parts,eps=.015){let mx=Math.max(...parts);return mx>eps?'Unstable':mx>=-eps?'Marginal':'Stable'}
 function statusStyle(s){let el=$('status'),color=s==='Stable'?P.accent:s==='Marginal'?P.warn:P.danger;el.style.color=color;el.style.borderColor=color;el.style.background=`${color}14`;el.textContent=s}
-function mechanical(){let m=+$('m').value,b=+$('b').value,k=+$('k').value,F=+$('F').value,z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),real=ps.map(p=>typeof p==='number'?p:p.re),s=statusFromRealParts(real),cls=b<0?'Negative damping / divergent':b===0?'Undamped':Math.abs(z-1)<.02?'Critically damped':z<1?'Underdamped':'Overdamped';return{d:second(m,b,k,F),a:`ζ ${z.toFixed(3)}`,b:`poles ${poleText(ps)}`,c:cls,s}}
+function mechanical(){let m=+$('m').value,b=+$('b').value,k=+$('k').value,F=+$('F').value,z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),real=ps.map(p=>typeof p==='number'?p:p.re),s=statusFromRealParts(real),cls=b<0?'Negative damping / divergent':b===0?'Undamped':Math.abs(z-1)<.02?'Critically damped':z<1?'Underdamped':'Overdamped';return{d:mechanicalRK4(m,b,k,F),a:`ζ ${z.toFixed(3)} | RK4`,b:`poles ${poleText(ps)}`,c:cls,s}}
 function electrical(){let R=+$('R').value,L=+$('L').value,C=+$('C').value,V=+$('V').value,z=R/2*Math.sqrt(C/L),ps=secondOrderPoles(L,R,1/C),real=ps.map(p=>typeof p==='number'?p:p.re),s=statusFromRealParts(real),q=0,i=0,dt=.0008,T=12,o=[];for(let n=0;n<T/dt;n++){let vc=q/C,di=(V-R*i-vc)/L;i+=di*dt;q+=i*dt;if(n%18===0)safePush(o,n*dt,(q/C)/V);if(Math.abs((q/C)/V)>50)break}let cls=R<0?'Negative resistance / divergent':Math.abs(z)<.015?'Undamped':Math.abs(z-1)<.02?'Critically damped':z<1?'Underdamped':'Overdamped';return{d:o,a:`ζ ${z.toFixed(3)}`,b:`poles ${poleText(ps)}`,c:cls,s}}
 function pneumatic(){let m=+$('pm').value,b=+$('pb').value,t=+$('pt').value,g=+$('pg').value,dt=.004,T=12,x=0,v=0,p=0,k=35,o=[];for(let n=0;n<T/dt;n++){p+=(1-p)/t*dt;let a=(g*p-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(n%5===0)safePush(o,n*dt,x/(g/k));if(Math.abs(x/(g/k))>50)break}let z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),s=b<0?'Unstable':Math.abs(b)<.05?'Marginal':'Stable';return{d:o,a:`ζm ${z.toFixed(3)}`,b:`mech poles ${poleText(ps)}`,c:b<0?'Negative damping / divergent':Math.abs(b)<.05?'Undamped':'Damped actuator',s}}
 function hydraulic(){let m=+$('hm').value,b=+$('hb').value,k=+$('hk').value,g=+$('hg').value,dt=.003,T=12,x=0,v=0,p=0,t=.12,o=[];for(let n=0;n<T/dt;n++){p+=(1-p)/t*dt;let a=(g*p-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(n%7===0)safePush(o,n*dt,x/(g/k));if(Math.abs(x/(g/k))>50)break}let z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),s=b<0?'Unstable':Math.abs(b)<.05?'Marginal':'Stable';return{d:o,a:`ζ ${z.toFixed(3)}`,b:`mech poles ${poleText(ps)}`,c:b<0?'Negative damping / divergent':Math.abs(b)<.05?'Undamped':z<1?'Underdamped':'Overdamped',s}}
@@ -31,3 +31,37 @@ hero();controls();pole();bode();
 // - Hydraulic compressibility and feedforward roadmap
 console.log("Phase 2 controls framework enabled");
 
+
+
+// ===== Phase 3A Numerical Solver Engine =====
+function rk4Step(f,x,u,t,dt){
+ const k1=f(x,u,t);
+ const x2=x.map((v,i)=>v+k1[i]*dt/2);
+ const k2=f(x2,u,t+dt/2);
+ const x3=x.map((v,i)=>v+k2[i]*dt/2);
+ const k3=f(x3,u,t+dt/2);
+ const x4=x.map((v,i)=>v+k3[i]*dt);
+ const k4=f(x4,u,t+dt);
+ return x.map((v,i)=>v+(dt/6)*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));
+}
+
+function simulate(f,x0,u,tEnd,dt){
+ let x=[...x0];
+ const out=[];
+ for(let t=0;t<=tEnd;t+=dt){
+   out.push([t,x[0]]);
+   x=rk4Step(f,x,u,t,dt);
+   if(Math.abs(x[0])>50) break;
+ }
+ return out;
+}
+
+function mechanicalRK4(m,b,k,F,T=12,dt=.004){
+ function dynamics(x,u,t){
+   return [
+      x[1],
+      (u-b*x[1]-k*x[0])/m
+   ];
+ }
+ return simulate(dynamics,[0,0],F,T,dt);
+}
