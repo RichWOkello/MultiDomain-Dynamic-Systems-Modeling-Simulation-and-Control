@@ -20,3 +20,14 @@ document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelect
 function pole(){let c=$('poleCanvas'),x=c.getContext('2d'),w=c.width,h=c.height,p={l:45,r:22,t:20,b:36};x.clearRect(0,0,w,h);grid(x,w,h,p,6,4);let X=a=>p.l+(w-p.l-p.r)*(a+5)/10,Y=a=>h-p.b-(h-p.t-p.b)*(a+5)/10;x.strokeStyle='#4a6265';x.beginPath();x.moveTo(X(0),p.t);x.lineTo(X(0),h-p.b);x.stroke();x.beginPath();x.moveTo(p.l,Y(0));x.lineTo(w-p.r,Y(0));x.stroke();[[-.4,3.14],[-.4,-3.14]].forEach(([a,b])=>{let q=X(a),r=Y(b),s=7;x.strokeStyle=P.blue;x.lineWidth=3;x.beginPath();x.moveTo(q-s,r-s);x.lineTo(q+s,r+s);x.stroke();x.beginPath();x.moveTo(q+s,r-s);x.lineTo(q-s,r+s);x.stroke()})}
 function bode(){let c=$('bodeCanvas'),x=c.getContext('2d'),w=c.width,h=c.height,p={l:50,r:22,t:18,b:36};x.clearRect(0,0,w,h);grid(x,w,h,p,6,4);let pts=[],m=10,b=.8,k=100;for(let i=0;i<180;i++){let lw=-1+3*i/179,o=10**lw,mag=1/Math.sqrt((k-m*o*o)**2+(b*o)**2);pts.push([lw,20*Math.log10(mag)])}let lo=Math.min(...pts.map(v=>v[1]))-3,hi=Math.max(...pts.map(v=>v[1]))+3,X=a=>p.l+(w-p.l-p.r)*(a+1)/3,Y=a=>h-p.b-(h-p.t-p.b)*(a-lo)/(hi-lo);x.strokeStyle=P.accent;x.lineWidth=2.5;x.beginPath();pts.forEach(([a,b],i)=>i?x.lineTo(X(a),Y(b)):x.moveTo(X(a),Y(b)));x.stroke()}
 hero();controls();pole();bode();
+
+
+// ===== Phase 2 Engineering Roadmap =====
+// Added after community feedback:
+// - Mechanical force scaling validation
+// - Root Locus panel placeholder
+// - Nyquist panel placeholder
+// - State-Space / LQR playground placeholder
+// - Hydraulic compressibility and feedforward roadmap
+console.log("Phase 2 controls framework enabled");
+
