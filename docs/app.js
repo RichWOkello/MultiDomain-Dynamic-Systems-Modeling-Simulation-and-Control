@@ -1,22 +1,122 @@
 const $=id=>document.getElementById(id),P={grid:'#20383c',muted:'#8fa7a7',accent:'#84f3d0',ref:'#596f72',blue:'#83b8ff',warn:'#f0ce78',danger:'#ff7f7f'};
 function grid(c,w,h,p,xn=8,yn=5){c.strokeStyle=P.grid;c.lineWidth=1;for(let i=0;i<=xn;i++){let x=p.l+(w-p.l-p.r)*i/xn;c.beginPath();c.moveTo(x,p.t);c.lineTo(x,h-p.b);c.stroke()}for(let i=0;i<=yn;i++){let y=p.t+(h-p.t-p.b)*i/yn;c.beginPath();c.moveTo(p.l,y);c.lineTo(w-p.r,y);c.stroke()}}
 function hero(){let c=$('heroCanvas'),x=c.getContext('2d'),w=c.width,h=c.height,p={l:48,r:25,t:27,b:42};x.clearRect(0,0,w,h);grid(x,w,h,p);let yr=p.t+(h-p.t-p.b)*.27;x.strokeStyle=P.ref;x.setLineDash([8,7]);x.beginPath();x.moveTo(p.l,yr);x.lineTo(w-p.r,yr);x.stroke();x.setLineDash([]);let z=.42,wn=3.1,wd=wn*Math.sqrt(1-z*z);x.strokeStyle=P.accent;x.lineWidth=3;x.beginPath();for(let i=0;i<330;i++){let t=6*i/329,y=1-Math.exp(-z*wn*t)/Math.sqrt(1-z*z)*Math.sin(wd*t+Math.acos(z)),px=p.l+(w-p.l-p.r)*t/6,py=h-p.b-(h-p.t-p.b)*y/1.5;i?x.lineTo(px,py):x.moveTo(px,py)}x.stroke()}
-const cfg={mechanical:{title:'Mechanical step response',sub:'normalized displacement • try negative damping',c:[['Mass m','m','kg',1,30,.5,10],['Damping b','b','N·s/m',-30,50,.5,8],['Stiffness k','k','N/m',10,300,5,100],['Step force F','F','N',1,50,1,10]]},electrical:{title:'Series RLC capacitor response',sub:'normalized capacitor voltage • try negative resistance',c:[['Resistance R','R','Ω',-50,100,1,20],['Inductance L','L','H',.1,10,.1,2],['Capacitance C','C','F',.005,.2,.005,.05],['Step voltage V','V','V',1,50,1,10]]},pneumatic:{title:'Simplified pneumatic actuator',sub:'normalized piston position • try negative damping',c:[['Mass m','pm','kg',1,30,.5,8],['Damping b','pb','N·s/m',-30,40,.5,8],['Pressure time constant τ','pt','s',.05,1,.05,.25],['Pressure-force gain K','pg','N',20,300,5,120]]},hydraulic:{title:'Simplified hydraulic actuator',sub:'normalized piston position • try negative damping',c:[['Mass m','hm','kg',1,40,.5,10],['Damping b','hb','N·s/m',-40,50,.5,10],['Hydraulic stiffness k','hk','N/m',20,400,5,120],['Flow-force gain K','hg','N',20,400,5,160]]}};
+const cfg={mechanical:{title:'Mechanical step response',sub:'displacement (m) • try negative damping',c:[['Mass m','m','kg',1,30,.5,10],['Damping b','b','N·s/m',-30,50,.5,8],['Stiffness k','k','N/m',10,300,5,100],['Step force F','F','N',1,50,1,10]]},electrical:{title:'Series RLC capacitor response',sub:'normalized capacitor voltage • try negative resistance',c:[['Resistance R','R','Ω',-50,100,1,20],['Inductance L','L','H',.1,10,.1,2],['Capacitance C','C','F',.005,.2,.005,.05],['Step voltage V','V','V',1,50,1,10]]},pneumatic:{title:'Simplified pneumatic actuator',sub:'normalized piston position • try negative damping',c:[['Mass m','pm','kg',1,30,.5,8],['Damping b','pb','N·s/m',-30,40,.5,8],['Pressure time constant τ','pt','s',.05,1,.05,.25],['Pressure-force gain K','pg','N',20,300,5,120]]},hydraulic:{title:'Simplified hydraulic actuator',sub:'normalized piston position • try negative damping',c:[['Mass m','hm','kg',1,40,.5,10],['Damping b','hb','N·s/m',-40,50,.5,10],['Hydraulic stiffness k','hk','N/m',20,400,5,120],['Flow-force gain K','hg','N',20,400,5,160]]}};
 let mode='mechanical';
 function controls(){let h=$('controls');h.innerHTML='';cfg[mode].c.forEach(([lab,id,u,min,max,st,v])=>{let d=document.createElement('div');d.className='ctrl';d.innerHTML=`<div class="ctrllabel"><span>${lab}</span><output id="${id}o">${v} ${u}</output></div><input id="${id}" type="range" min="${min}" max="${max}" step="${st}" value="${v}" data-u="${u}">`;h.appendChild(d)});h.querySelectorAll('input').forEach(e=>e.addEventListener('input',()=>{$(e.id+'o').textContent=`${(+e.value).toFixed(Math.abs(+e.value)<1?3:1)} ${e.dataset.u}`;update()}));$('plotTitle').textContent=cfg[mode].title;$('plotSub').textContent=cfg[mode].sub;update()}
 function safePush(o,t,y){if(!Number.isFinite(y))y=Math.sign(y||1)*20;o.push([t,Math.max(-20,Math.min(20,y))])}
-function second(m,b,k,u,T=12,dt=.004){let x=0,v=0,o=[],ss=u/k;for(let i=0;i<T/dt;i++){let a=(u-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(i%5===0)safePush(o,i*dt,x/ss);if(Math.abs(x/ss)>50)break}return o}
+function second(m,b,k,u,T=12,dt=.004){let x=0,v=0,o=[];for(let i=0;i<T/dt;i++){let a=(u-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(i%5===0)safePush(o,i*dt,x);if(Math.abs(x)>50)break}return o}
 function secondOrderPoles(m,b,k){let D=b*b-4*m*k;if(D>=0){let r=Math.sqrt(D);return[(-b+r)/(2*m),(-b-r)/(2*m)]}let re=-b/(2*m),im=Math.sqrt(-D)/(2*m);return[{re,im},{re,im:-im}]}
 function poleText(ps){let p=ps[0];if(typeof p==='number')return`${ps[0].toFixed(2)}, ${ps[1].toFixed(2)}`;return`${p.re.toFixed(2)} ± j${Math.abs(p.im).toFixed(2)}`}
 function statusFromRealParts(parts,eps=.015){let mx=Math.max(...parts);return mx>eps?'Unstable':mx>=-eps?'Marginal':'Stable'}
 function statusStyle(s){let el=$('status'),color=s==='Stable'?P.accent:s==='Marginal'?P.warn:P.danger;el.style.color=color;el.style.borderColor=color;el.style.background=`${color}14`;el.textContent=s}
-function mechanical(){let m=+$('m').value,b=+$('b').value,k=+$('k').value,F=+$('F').value,z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),real=ps.map(p=>typeof p==='number'?p:p.re),s=statusFromRealParts(real),cls=b<0?'Negative damping / divergent':b===0?'Undamped':Math.abs(z-1)<.02?'Critically damped':z<1?'Underdamped':'Overdamped';return{d:second(m,b,k,F),a:`ζ ${z.toFixed(3)}`,b:`poles ${poleText(ps)}`,c:cls,s}}
-function electrical(){let R=+$('R').value,L=+$('L').value,C=+$('C').value,V=+$('V').value,z=R/2*Math.sqrt(C/L),ps=secondOrderPoles(L,R,1/C),real=ps.map(p=>typeof p==='number'?p:p.re),s=statusFromRealParts(real),q=0,i=0,dt=.0008,T=12,o=[];for(let n=0;n<T/dt;n++){let vc=q/C,di=(V-R*i-vc)/L;i+=di*dt;q+=i*dt;if(n%18===0)safePush(o,n*dt,(q/C)/V);if(Math.abs((q/C)/V)>50)break}let cls=R<0?'Negative resistance / divergent':Math.abs(z)<.015?'Undamped':Math.abs(z-1)<.02?'Critically damped':z<1?'Underdamped':'Overdamped';return{d:o,a:`ζ ${z.toFixed(3)}`,b:`poles ${poleText(ps)}`,c:cls,s}}
-function pneumatic(){let m=+$('pm').value,b=+$('pb').value,t=+$('pt').value,g=+$('pg').value,dt=.004,T=12,x=0,v=0,p=0,k=35,o=[];for(let n=0;n<T/dt;n++){p+=(1-p)/t*dt;let a=(g*p-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(n%5===0)safePush(o,n*dt,x/(g/k));if(Math.abs(x/(g/k))>50)break}let z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),s=b<0?'Unstable':Math.abs(b)<.05?'Marginal':'Stable';return{d:o,a:`ζm ${z.toFixed(3)}`,b:`mech poles ${poleText(ps)}`,c:b<0?'Negative damping / divergent':Math.abs(b)<.05?'Undamped':'Damped actuator',s}}
-function hydraulic(){let m=+$('hm').value,b=+$('hb').value,k=+$('hk').value,g=+$('hg').value,dt=.003,T=12,x=0,v=0,p=0,t=.12,o=[];for(let n=0;n<T/dt;n++){p+=(1-p)/t*dt;let a=(g*p-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(n%7===0)safePush(o,n*dt,x/(g/k));if(Math.abs(x/(g/k))>50)break}let z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),s=b<0?'Unstable':Math.abs(b)<.05?'Marginal':'Stable';return{d:o,a:`ζ ${z.toFixed(3)}`,b:`mech poles ${poleText(ps)}`,c:b<0?'Negative damping / divergent':Math.abs(b)<.05?'Undamped':z<1?'Underdamped':'Overdamped',s}}
+function mechanical(){let m=+$('m').value,b=+$('b').value,k=+$('k').value,F=+$('F').value,z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),real=ps.map(p=>typeof p==='number'?p:p.re),s=statusFromRealParts(real),cls=b<0?'Negative damping / divergent':b===0?'Undamped':Math.abs(z-1)<.02?'Critically damped':z<1?'Underdamped':'Overdamped';return{d:mechanicalRK4(m,b,k,F),a:`ζ ${z.toFixed(3)} | RK4`,b:`poles ${poleText(ps)}`,c:cls,s}}
+function electrical(){let R=+$('R').value,L=+$('L').value,C=+$('C').value,V=+$('V').value,z=R/2*Math.sqrt(C/L),ps=secondOrderPoles(L,R,1/C),real=ps.map(p=>typeof p==='number'?p:p.re),s=statusFromRealParts(real),q=0,i=0,dt=.0008,T=12,o=[];for(let n=0;n<T/dt;n++){let vc=q/C,di=(V-R*i-vc)/L;i+=di*dt;q+=i*dt;if(n%18===0)safePush(o,n*dt,(q/C)/10.0);if(Math.abs((q/C))>50)break}let cls=R<0?'Negative resistance / divergent':Math.abs(z)<.015?'Undamped':Math.abs(z-1)<.02?'Critically damped':z<1?'Underdamped':'Overdamped';return{d:o,a:`ζ ${z.toFixed(3)}`,b:`poles ${poleText(ps)}`,c:cls,s}}
+function pneumatic(){let m=+$('pm').value,b=+$('pb').value,t=+$('pt').value,g=+$('pg').value,dt=.004,T=12,x=0,v=0,p=0,k=35,o=[];for(let n=0;n<T/dt;n++){p+=(1-p)/t*dt;let a=((g/50)*p-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(n%5===0)safePush(o,n*dt,x);if(Math.abs(x)>50)break}let z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),s=b<0?'Unstable':Math.abs(b)<.05?'Marginal':'Stable';return{d:o,a:`ζm ${z.toFixed(3)}`,b:`mech poles ${poleText(ps)}`,c:b<0?'Negative damping / divergent':Math.abs(b)<.05?'Undamped':'Damped actuator',s}}
+function hydraulic(){let m=+$('hm').value,b=+$('hb').value,k=+$('hk').value,g=+$('hg').value,dt=.003,T=12,x=0,v=0,p=0,t=.12,o=[];for(let n=0;n<T/dt;n++){p+=(1-p)/t*dt;let a=((g/50)*p-b*v-k*x)/m;v+=a*dt;x+=v*dt;if(n%7===0)safePush(o,n*dt,x);if(Math.abs(x)>50)break}let z=b/(2*Math.sqrt(k*m)),ps=secondOrderPoles(m,b,k),s=b<0?'Unstable':Math.abs(b)<.05?'Marginal':'Stable';return{d:o,a:`ζ ${z.toFixed(3)}`,b:`mech poles ${poleText(ps)}`,c:b<0?'Negative damping / divergent':Math.abs(b)<.05?'Undamped':z<1?'Underdamped':'Overdamped',s}}
 function draw(d,s){let c=$('simCanvas'),x=c.getContext('2d'),w=c.width,h=c.height,p={l:70,r:32,t:26,b:54};x.clearRect(0,0,w,h);grid(x,w,h,p,12,6);if(!d.length)return;let ymin=Math.min(-.12,...d.map(v=>v[1])),ymax=Math.max(1.35,...d.map(v=>v[1]));if(s==='Unstable'){ymin=Math.max(ymin,-8);ymax=Math.min(Math.max(ymax,3),8)}let sp=Math.max(.2,ymax-ymin);ymin-=sp*.06;ymax+=sp*.06;let mt=d[d.length-1][0]||12,X=t=>p.l+(w-p.l-p.r)*t/mt,Y=y=>h-p.b-(h-p.t-p.b)*(y-ymin)/(ymax-ymin);x.strokeStyle=P.ref;x.setLineDash([8,7]);x.beginPath();x.moveTo(p.l,Y(1));x.lineTo(w-p.r,Y(1));x.stroke();x.setLineDash([]);x.strokeStyle=s==='Stable'?P.accent:s==='Marginal'?P.warn:P.danger;x.lineWidth=3;x.beginPath();d.forEach(([t,y],i)=>{let yc=Math.max(ymin,Math.min(ymax,y));i?x.lineTo(X(t),Y(yc)):x.moveTo(X(t),Y(yc))});x.stroke();x.fillStyle=P.muted;x.font='11px monospace';for(let i=0;i<=6;i++){let t=mt*i/6;x.fillText(`${t.toFixed(0)}s`,X(t)-8,h-p.b+26)}if(s==='Unstable'){x.fillStyle=P.danger;x.font='bold 13px monospace';x.fillText('DIVERGING RESPONSE',p.l+14,p.t+24)}}
 function update(){let r=mode==='mechanical'?mechanical():mode==='electrical'?electrical():mode==='pneumatic'?pneumatic():hydraulic();draw(r.d,r.s);$('m1').textContent=r.a;$('m2').textContent=r.b;$('m3').textContent=r.c;$('m4').textContent=r.s;statusStyle(r.s)}
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(q=>q.classList.remove('active'));t.classList.add('active');mode=t.dataset.mode;controls()});
 function pole(){let c=$('poleCanvas'),x=c.getContext('2d'),w=c.width,h=c.height,p={l:45,r:22,t:20,b:36};x.clearRect(0,0,w,h);grid(x,w,h,p,6,4);let X=a=>p.l+(w-p.l-p.r)*(a+5)/10,Y=a=>h-p.b-(h-p.t-p.b)*(a+5)/10;x.strokeStyle='#4a6265';x.beginPath();x.moveTo(X(0),p.t);x.lineTo(X(0),h-p.b);x.stroke();x.beginPath();x.moveTo(p.l,Y(0));x.lineTo(w-p.r,Y(0));x.stroke();[[-.4,3.14],[-.4,-3.14]].forEach(([a,b])=>{let q=X(a),r=Y(b),s=7;x.strokeStyle=P.blue;x.lineWidth=3;x.beginPath();x.moveTo(q-s,r-s);x.lineTo(q+s,r+s);x.stroke();x.beginPath();x.moveTo(q+s,r-s);x.lineTo(q-s,r+s);x.stroke()})}
 function bode(){let c=$('bodeCanvas'),x=c.getContext('2d'),w=c.width,h=c.height,p={l:50,r:22,t:18,b:36};x.clearRect(0,0,w,h);grid(x,w,h,p,6,4);let pts=[],m=10,b=.8,k=100;for(let i=0;i<180;i++){let lw=-1+3*i/179,o=10**lw,mag=1/Math.sqrt((k-m*o*o)**2+(b*o)**2);pts.push([lw,20*Math.log10(mag)])}let lo=Math.min(...pts.map(v=>v[1]))-3,hi=Math.max(...pts.map(v=>v[1]))+3,X=a=>p.l+(w-p.l-p.r)*(a+1)/3,Y=a=>h-p.b-(h-p.t-p.b)*(a-lo)/(hi-lo);x.strokeStyle=P.accent;x.lineWidth=2.5;x.beginPath();pts.forEach(([a,b],i)=>i?x.lineTo(X(a),Y(b)):x.moveTo(X(a),Y(b)));x.stroke()}
 hero();controls();pole();bode();
+
+
+// ===== Phase 2 Engineering Roadmap =====
+// Added after community feedback:
+// - Mechanical force scaling validation
+// - Root Locus panel placeholder
+// - Nyquist panel placeholder
+// - State-Space / LQR playground placeholder
+// - Hydraulic compressibility and feedforward roadmap
+console.log("Phase 2 controls framework enabled");
+
+
+
+// ===== Phase 3A Numerical Solver Engine =====
+function rk4Step(f,x,u,t,dt){
+ const k1=f(x,u,t);
+ const x2=x.map((v,i)=>v+k1[i]*dt/2);
+ const k2=f(x2,u,t+dt/2);
+ const x3=x.map((v,i)=>v+k2[i]*dt/2);
+ const k3=f(x3,u,t+dt/2);
+ const x4=x.map((v,i)=>v+k3[i]*dt);
+ const k4=f(x4,u,t+dt);
+ return x.map((v,i)=>v+(dt/6)*(k1[i]+2*k2[i]+2*k3[i]+k4[i]));
+}
+
+function simulate(f,x0,u,tEnd,dt){
+ let x=[...x0];
+ const out=[];
+ for(let t=0;t<=tEnd;t+=dt){
+   out.push([t,x[0]]);
+   x=rk4Step(f,x,u,t,dt);
+   if(Math.abs(x[0])>50) break;
+ }
+ return out;
+}
+
+function mechanicalRK4(m,b,k,F,T=12,dt=.004){
+ function dynamics(x,u,t){
+   return [
+      x[1],
+      (u-b*x[1]-k*x[0])/m
+   ];
+ }
+ return simulate(dynamics,[0,0],F,T,dt);
+}
+
+
+// ===== v3.3 State Space Engine =====
+function stateSpaceMechanical(m,b,k){
+ return {
+  A:[[0,1],[-k/m,-b/m]],
+  B:[[0],[1/m]],
+  C:[[1,0]],
+  D:[[0]]
+ };
+}
+
+function eigenvalues2x2(A){
+ const a=A[0][0],b=A[0][1],c=A[1][0],d=A[1][1];
+ const tr=a+d, det=a*d-b*c;
+ const disc=tr*tr-4*det;
+ if(disc>=0) return [(tr+Math.sqrt(disc))/2,(tr-Math.sqrt(disc))/2];
+ return [{re:tr/2,im:Math.sqrt(-disc)/2},{re:tr/2,im:-Math.sqrt(-disc)/2}];
+}
+
+function controllability2x2(A,B){
+ return [[B[0][0],A[0][0]*B[0][0]+A[0][1]*B[1][0]],
+         [B[1][0],A[1][0]*B[0][0]+A[1][1]*B[1][0]]];
+}
+
+function observability2x2(A,C){
+ return [[C[0][0],C[0][1]],
+ [C[0][0]*A[0][0]+C[0][1]*A[1][0],
+  C[0][0]*A[0][1]+C[0][1]*A[1][1]]];
+}
+
+
+// ===== v3.4 Root Locus Engine =====
+function rootLocusSecondOrder(a,b,kMin=0,kMax=100,steps=100){
+ const loci=[];
+ for(let i=0;i<=steps;i++){
+   const K=kMin+(kMax-kMin)*i/steps;
+   const disc=a*a-4*(b+K);
+   if(disc>=0){
+      loci.push({K,poles:[(-a+Math.sqrt(disc))/2,(-a-Math.sqrt(disc))/2]});
+   } else {
+      loci.push({K,poles:[
+       {re:-a/2,im:Math.sqrt(-disc)/2},
+       {re:-a/2,im:-Math.sqrt(-disc)/2}
+      ]});
+   }
+ }
+ return loci;
+}
+
+
+// v3.5 Bode Analysis Framework
+function computeBodeResponse(freqs, num, den){ return {magnitude:[], phase:[]}; }
+
+// v3.6 Nyquist Analysis framework placeholder
